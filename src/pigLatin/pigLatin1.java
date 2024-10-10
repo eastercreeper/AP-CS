@@ -1,5 +1,9 @@
 package pigLatin;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+
 public class pigLatin1 {
 
 	public static boolean charIsInString(char c, String s) {
@@ -7,7 +11,7 @@ public class pigLatin1 {
 	}
 
 	public static boolean isVowel(char c) {
-		return (c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u');
+		return (c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u' || c=='y');
 	}
 
 	public static boolean isConsonant(char c) {
@@ -31,7 +35,11 @@ public class pigLatin1 {
 	}
 
 	public static boolean checkY(String s) {
-		return false;
+		if(s.toLowerCase().charAt(0) == 'y') {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	public static boolean checkCaptial(String s) {
@@ -41,12 +49,22 @@ public class pigLatin1 {
 	public static String pigLatin_v1(String s) {
 		String finish = "";
 		if (firstVowelIndex(s) != -1) {
+
 			if(checkCaptial(s)) {
+
+				if(checkY(s)) {
+					String noY = s.substring(1);
+					char orig = noY.charAt(firstVowelIndex(noY)) ;
+					char upper = Character.toUpperCase(orig);
+					return upper + noY.substring(firstVowelIndex(noY) +1) + s.toLowerCase().charAt(0) + "ay";
+				}
+
 				if (isVowel(s.toLowerCase().charAt(0))) {
 					char orig = s.charAt(0);
 					char upper = Character.toUpperCase(orig);
 					return upper + s.substring(1) + "way";
 				}
+
 				if(checkQU(s)) {
 					char orig = s.charAt(firstVowelIndex(s)+1);
 					char upper = Character.toUpperCase(orig);
@@ -54,15 +72,22 @@ public class pigLatin1 {
 				} else {
 					char orig = s.charAt(firstVowelIndex(s));
 					char upper = Character.toUpperCase(orig);
-					System.out.println("no qu");
 					finish = upper + s.substring(firstVowelIndex(s) + 1) + s.substring(0, firstVowelIndex(s)).toLowerCase() + "ay";
 				}
+
 			} else {
+
+				if(checkY(s)) {
+					String noY = s.substring(1);
+					return  noY.substring(firstVowelIndex(noY)) + s.toLowerCase().charAt(0) + "ay";
+				}
+
 				if(checkQU(s)) {
 					return s.substring(firstVowelIndex(s)+1) + s.substring(0, firstVowelIndex(s)+1) + "ay";
 				} else {
 					return s.substring(firstVowelIndex(s)) + s.substring(0, firstVowelIndex(s)) + "ay";
 				}
+
 			}
 			return finish;
 		}
@@ -70,12 +95,18 @@ public class pigLatin1 {
 	}
 
 	public static void main(String[] args) {
-		//System.out.println(pigLatin_v1("hello"));
-		System.out.println(pigLatin_v1("Oogway"));
-		System.out.println(pigLatin_v1("pdfs"));
-		System.out.println(pigLatin_v1("Throw"));
-		System.out.println(pigLatin_v1("Question"));
-		System.out.println(pigLatin_v1("question"));
-		System.out.println(pigLatin_v1("squeeze"));
-	}
+
+		File file = new File("src/assets/pigLatin.txt");
+
+		try {
+			Scanner sc = new Scanner(file);
+
+			while(sc.hasNextLine()) {
+				System.out.println(pigLatin_v1(sc.nextLine()));
+			}
+
+		} catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
-public class pigLatin1 {
+public class pigLatin {
 
 	public static boolean charIsInString(char c, String s) {
 		return s.contains(c + "");

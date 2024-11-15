@@ -1,4 +1,4 @@
-package heatmap;//Programmer:
+package heatMap;
 
 import javax.swing.*;
 import java.awt.*;
@@ -8,6 +8,12 @@ import java.awt.image.*;
 public class HeatMap extends JPanel implements MouseListener {
 
 	private static final Color BACKGROUND = new Color(204, 204, 204);
+
+	private static final int[] TEMP_RANGES = {-150,-140, -130, -120, -110, -100, -90, -80, -70, -60, -50, -40, -30, -20, -10, 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140};
+
+	private static final int[] RED_VALUES = {0,0, 0, 0, 0, 0, 0, 0, 17, 51, 85, 119, 153, 187, 221, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255};
+	private static final int[] GREEN_VALUES = {0, 34, 68, 102, 136, 170, 204, 238, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 241, 207, 173, 139, 105, 71, 37};
+	private static final int[] BLUE_VALUES = {255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 217, 183, 149, 115, 81, 47, 13, 0, 0, 0, 0, 0, 0, 0};
 
 	private double[][] tempGrid = new double[50][50];
 	private double maxTemp = 150;
@@ -23,15 +29,15 @@ public class HeatMap extends JPanel implements MouseListener {
 		for (int i = 0; i < tempGrid.length; i++) {
 			for (int j = 0; j < tempGrid[i].length; j++) {
 				if (j < tempGrid[i].length / 2) {
-					tempGrid[i][j] = -150;
+					tempGrid[i][j] = -150;  // Left half is cold (-150)
 				} else {
-					tempGrid[i][j] = 150;
+					tempGrid[i][j] = 150;   // Right half is hot (150)
 				}
 			}
 		}
 		// TODO: uncomment timer start once you get the color methods to work.
 		Timer t = new Timer(40, new Listener());
-		t.start();
+		// t.start();
 
 		addMouseListener(this);
 
@@ -43,43 +49,30 @@ public class HeatMap extends JPanel implements MouseListener {
 
 	// TODO: complete methods - given a temp value return proper R G or B value.
 	public int getRed(double temp) {
-		if(temp > maxTemp) {
-			temp = maxTemp;
+		for (int i = 0; i < TEMP_RANGES.length; i++) {
+			if (temp <= TEMP_RANGES[i]) {
+				return RED_VALUES[i];
+			}
 		}
-		if(temp < minTemp) {
-			temp = minTemp;
-		}
-		if(temp<=-80) return 0;
-		if(temp<=-10) return 255 - (int)(temp/10*-1) * 35;
-		if(temp>=0) return 255;
-		return 0;
+		return RED_VALUES[RED_VALUES.length - 1];
 	}
 
 	public int getGreen(double temp) {
-		if(temp > maxTemp) {
-			temp = maxTemp;
+		for (int i = 0; i < TEMP_RANGES.length; i++) {
+			if (temp <= TEMP_RANGES[i]) {
+				return GREEN_VALUES[i];
+			}
 		}
-		if(temp < minTemp) {
-			temp = minTemp;
-		}
-		if(temp <=140 && temp >= 80) return 0;
-		if(temp<=-80) return (int) (((-150-temp)/10)*-1*35);
-		if(temp>=-70 && temp<= 70) return 255;
-		if(temp>=80) return (int) (((150-temp)/10)*35);
-		return 0;
+		return GREEN_VALUES[GREEN_VALUES.length - 1];
 	}
 
 	public int getBlue(double temp) {
-		if(temp > maxTemp) {
-			temp = maxTemp;
+		for (int i = 0; i < TEMP_RANGES.length; i++) {
+			if (temp <= TEMP_RANGES[i]) {
+				return BLUE_VALUES[i];
+			}
 		}
-		if(temp < minTemp) {
-			temp = minTemp;
-		}
-		if(temp <= 0) return 255;
-		if(temp>=80) return 0;
-		if(temp<80 && temp>=10) return (255-(((int) temp/10)*35));
-		return 0;
+		return BLUE_VALUES[BLUE_VALUES.length - 1];
 	}
 
 	// draws squares representing the temp in each cell
@@ -121,24 +114,12 @@ public class HeatMap extends JPanel implements MouseListener {
 		int x = event.getX();
 		int y = event.getY();
 
-		int blockHeight = getHeight() / tempGrid.length + 1;
-		int blockWidth = getWidth() / tempGrid[0].length + 1;
-
-		clickedRow = y / blockHeight;
-		clickedCol = x / blockWidth;
-
-		if (event.getButton() == MouseEvent.BUTTON1) {
-			clickTemp = (int) (10 * maxTemp);
-		} else if (event.getButton() == MouseEvent.BUTTON3) {
-			clickTemp = (int) (10 * minTemp);
-		}
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		// TODO: Part 3, reset clickedRow and clickedCol
-		clickedRow = -1;
-		clickedCol = -1;
+
 	}
 
 	// these mouse methods are unneeded for this lab
@@ -156,44 +137,11 @@ public class HeatMap extends JPanel implements MouseListener {
 
 	private class Listener implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
+			// TODO: recalculate every element of the 2D array
+			// update the temperature values in tempGrid
 
-
-			double[][] newTempGrid = new double[tempGrid.length][tempGrid[0].length];
-
-			for (int i = 0; i < tempGrid.length; i++) {
-
-				for (int j = 0; j < tempGrid[i].length; j++) {
-					double sum = tempGrid[i][j];
-					int count = 1;
-
-					if (i > 0) {
-						sum += tempGrid[i-1][j];
-						count++;
-					}
-					if (i < tempGrid.length - 1) {
-						sum += tempGrid[i+1][j];
-						count++;
-					}
-					if (j > 0) {
-						sum += tempGrid[i][j-1];
-						count++;
-					}
-					if (j < tempGrid[i].length - 1) {
-						sum += tempGrid[i][j+1];
-						count++;
-					}
-					newTempGrid[i][j] = sum / count;
-				}
-			}
-			for (int i = 0; i < tempGrid.length; i++) {
-				for (int j = 0; j < tempGrid[i].length; j++) {
-					tempGrid[i][j] = newTempGrid[i][j];
-				}
-			}
 			// TODO: in part 3 you will add an if statement here before repaint
-			if (clickedRow != -1 && clickedCol != -1) {
-				tempGrid[clickedRow][clickedCol] = clickTemp;
-			}
+
 			repaint(); // leave this as the last line of code in actionPerformed
 		}
 	}

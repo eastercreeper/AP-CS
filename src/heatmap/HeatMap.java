@@ -206,4 +206,5 @@ public class HeatMap extends JPanel implements MouseListener {
 		frame.setContentPane(new HeatMap());
 		frame.setVisible(true);
 	}
+	// idk why this isnt pushing help nmeeeeeeeee
 }
